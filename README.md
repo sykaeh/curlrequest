@@ -131,24 +131,54 @@ curl.request({ url: 'http://google.com', pretend: true }, function (err, stdout,
 
 Use this to specify an alternative path for curl.
 
+`details` - *default: false*
+
+Useful if you want more information than just the response body. Instead of just stdout, an object with the properties statusCode, headers and body is returned. For example:
+```javascript
+var response = {
+  statusCode: 200,
+  headers: {
+    'Content-Length': '18799'
+    'Accept-Ranges': 'bytes'
+    'Server': 'Apache/2.2.29 (Unix) mod_ssl/2.2.29 OpenSSL/1.0.1e-fips mod_bwlimited/1.4'
+    'Last-Modified': 'Sat, 06 Dec 2014 14:16:11 GMT'
+    'Server_IP': '104.245.16.71',
+    'Date': 'Thu, 31 Mar 2016 09:23:27 GMT',
+    'Content-Type': 'text/html'
+  },
+  body: '...' // string or buffer depending on the value of encoding.
+}
+```
+Info: This option makes use of the curl option `dump-header` and overwrites it with a temporary filename. This file is deleted at the end of the request. This means that `dump-header` and `details` cannot be used together. Additionally, the option `include` does not make sense, since the headers are are included in a different manner and is thus removed if present.
+
 ### Passing options directly to curl
 
 Any additional options are sent as command line options to curl. See `man
 curl` or `curl --manual` for a detailed description of options and usage.
 
-**Example 1**. Include response headers in the output
+**Example 1**. Include response status and headers in the output
 
 ```javascript
-var options = { url: 'google.com', include: true };
+var options = { url: 'google.com', details: true };
 
-curl.request(options, function (err, parts) {
-    parts = parts.split('\r\n');
-    var data = parts.pop()
-      , head = parts.pop();
+curl.request(options, function (err, response) {
+  // response.headers is a dictionary of the response headers of the final response
+  // response.statusCode is the status code of the final response
+  // response.body is the body of the final response (string or buffer, depending on encoding)
 });
 ```
 
-**Example 2**. Limit the download speed of a transfer
+**Example 2**. Allow insecure https connections
+
+```javascript
+var options = { url: 'google.com', insecure: true };
+
+curl.request(options, function (err, stdout) {
+
+});
+```
+
+**Example 3**. Limit the download speed of a transfer
 
 ```javascript
 var options = {
@@ -162,7 +192,7 @@ curl.request(options, function (err, file) {
 });
 ```
 
-**Example 3**. See what's going on under the hood
+**Example 4**. See what's going on under the hood
 
 ```javascript
 var options = {
@@ -198,4 +228,3 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-

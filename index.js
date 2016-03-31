@@ -1,5 +1,6 @@
 var util = require('util')
   , fs = require('fs')
+  , tmp = require('tmp')
   , spawn = require('./spawn')
   , errors = require('./errors')
   , cwd = process.cwd();
@@ -92,7 +93,29 @@ exports.request = function (options, callback) {
       , require_not_str
       , scope = {}
       , cmd = 'curl'
+      , detailsFilename = ''
       , timeout;
+
+    function parseHeaders(filename) {
+      var headerText = fs.readFileSync(filename, 'utf-8');
+      var parts = headerText.split('\r\n');
+      var headerParts;
+      var response = {};
+      for (var i=0; i < parts.length; i++) {
+        if (parts[i].startsWith('HTTP')) {
+          response.statusCode = parseInt(parts[i].split(' ')[1]);
+          response.headers = {};
+          inHeaders = true;
+        } else if (!parts[i].trim()) {
+          continue;
+        } else {
+          headerParts = parts[i].split(':');
+          response.headers[headerParts[0].trim()] = headerParts.splice(1).join(':').trim();
+        }
+      }
+      fs.unlinkSync(filename);
+      return response;
+    }
 
     function finish() {
         if (options.fail && stderr) {
@@ -100,11 +123,22 @@ exports.request = function (options, callback) {
         } else if (err in errors) {
             err = errors[err];
         }
-        callback.call(scope, err, stdout, {
-            cmd: cmd
-          , args: args
-          , time: (new Date().getTime() - start.getTime())
-        });
+
+        if (detailsFilename) {
+          var response = parseHeaders(detailsFilename);
+          response.body = stdout;
+          callback.call(scope, err, response, {
+              cmd: cmd
+            , args: args
+            , time: (new Date().getTime() - start.getTime())
+          });
+        } else {
+          callback.call(scope, err, stdout, {
+              cmd: cmd
+            , args: args
+            , time: (new Date().getTime() - start.getTime())
+          });
+        }
         complete = true;
     }
 
@@ -125,6 +159,13 @@ exports.request = function (options, callback) {
     } else {
       options.location = true;
     }
+
+    // Implement details
+    if (options.details) {
+      detailsFilename = tmp.tmpNameSync({ prefix: 'curlrequest-headers-' });
+      options['dump-header'] = detailsFilename;
+      delete options.details;
+      delete options.include;
     }
 
     //Add an additional setTimeout for max-time
