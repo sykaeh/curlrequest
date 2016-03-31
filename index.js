@@ -22,15 +22,6 @@ var curl_map = {
 var user_agents = require('./useragents.js')
   , user_agents_len = user_agents.length;
 
-/**
- * Default request headers.
- */
-
-var default_headers = {
-    'Accept': '*/*'
-  , 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3'
-  , 'Accept-Language': 'en-US,en;q=0.8'
-};
 
 /**
  * Make a request with cURL.
@@ -192,9 +183,6 @@ exports.request = function (options, callback) {
 
     //Setup default headers
     var key, headers = {};
-    for (key in default_headers) {
-        headers[key] = default_headers[key];
-    }
     if (options.headers) {
         var normalised_key;
         for (key in options.headers) {
