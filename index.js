@@ -201,8 +201,8 @@ exports.request = function (options, callback) {
         options.header.push(key + ': ' + headers[key]);
     }
 
-    //Select a random user agent if one wasn't provided
-    if (!headers['User-Agent'] && !options['user-agent']) {
+    //Select a random user agent if user-agent is set to true
+    if (options['user-agent'] === true) {
         options['user-agent'] = user_agents[Math.random() * user_agents_len | 0];
     }
 

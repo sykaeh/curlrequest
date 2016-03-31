@@ -64,9 +64,9 @@ Set request headers, e.g. `headers: { accept: 'text/*' }`
 
 An object containing data to urlencode and then POST.
 
-`useragent` - *default: <random>*
+`useragent` - *default: ''*
 
-Set the request user-agent.
+Set the request user-agent. Set to `true` for a random user agent.
 
 `location` - *default: true*
 
