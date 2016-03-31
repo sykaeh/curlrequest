@@ -114,12 +114,17 @@ exports.request = function (options, callback) {
         delete options.curl_path;
     }
 
+    //Set the maximum number of retries to 3 by default
+    if (options['max-redirs'] === undefined) {
+      options['max-redirs'] = 3;
+    }
+
     //Follow location by default
-    if ('max-redirs' in options) {
-        options.location = !!options['max-redirs'];
+    if (options.location === false) {
+      delete options.location;
     } else {
-        options.location = true;
-        options['max-redirs'] = 3;
+      options.location = true;
+    }
     }
 
     //Add an additional setTimeout for max-time
