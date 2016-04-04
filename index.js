@@ -100,7 +100,7 @@ exports.request = function (options, callback) {
       var headerText = fs.readFileSync(filename, 'utf-8');
       var parts = headerText.split('\r\n');
       var headerParts;
-      var response = {};
+      var response = {statusCode: null, headers: {}, body: null};
       for (var i=0; i < parts.length; i++) {
         if (parts[i].startsWith('HTTP')) {
           response.statusCode = parseInt(parts[i].split(' ')[1]);
