@@ -1,10 +1,9 @@
-{
-  "name": "curlrequest",
-  "description": "A curl wrapper for node",
-  "version": "0.5.7",
-  "homepage": "https://github.com/node-js-libs/curlrequest",
-  "author": "Chris O'Hara <cohara87@gmail.com>",
-  "main": "index",
+{ "name"          : "curlrequest",
+  "description"   : "A curl wrapper for node",
+  "version"       : "1.0.0",
+  "homepage"      : "https://github.com/node-js-libs/curlrequest",
+  "author"        : "Chris O'Hara <cohara87@gmail.com>",
+  "main"          : "index",
   "repository": {
     "type": "git",
     "url": "http://github.com/node-js-libs/curlrequest.git"
